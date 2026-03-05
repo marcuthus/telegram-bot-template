@@ -16,12 +16,12 @@
     "@types/morgan": "^1.9.4",
     "bot-command-options-parser": "^1.0.5",
     "dotenv": "^16.0.3",
-    "express": "^4.18.2",
+    "express": "^5.2.1",
     "morgan": "^1.10.0",
     "telegraf": "^4.11.2"
   },
   "devDependencies": {
-    "@types/express": "^4.17.15",
+    "@types/express": "^5.0.6",
     "@types/node": "^18.11.17",
     "nodemon": "^2.0.20",
     "ts-node": "^10.9.1"
