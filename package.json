@@ -24,6 +24,6 @@
     "@types/express": "^5.0.6",
     "@types/node": "^18.11.17",
     "nodemon": "^2.0.20",
-    "ts-node": "^10.9.1"
+    "ts-node": "^10.9.2"
   }
 }
