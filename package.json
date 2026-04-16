@@ -15,7 +15,7 @@
   "dependencies": {
     "@types/morgan": "^1.9.10",
     "bot-command-options-parser": "^1.0.5",
-    "dotenv": "^17.3.1",
+    "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "morgan": "^1.10.1",
     "telegraf": "^4.16.3"
