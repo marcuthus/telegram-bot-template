@@ -100,7 +100,8 @@ export default async (client: Client) => {
     }
 
     async function importCommand(commandFilePath: string) {
-        const command: AnyCommand = (await import(commandFilePath)).command
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const command: AnyCommand = require(commandFilePath).command
         return command
     }
 }
