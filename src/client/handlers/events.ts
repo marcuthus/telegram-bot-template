@@ -1,35 +1,51 @@
-import { Telegraf } from "telegraf"
-import path from "path"
-import fs from "fs"
+import path from "node:path"
+import fs from "node:fs"
 
-import IEvent from "../interfaces/event"
+import { Context } from "telegraf"
 
-export default async (client: Telegraf) => {
+import { createScopedLogger } from "../../helpers/logger.helper"
+import { Event } from "../interfaces/event"
+import { Client } from "../index"
+
+const logger = createScopedLogger("client")
+
+export default async (client: Client) => {
     const eventsDirPath = path.join(__dirname, "../events")
     const fileExtension = path.extname(__filename)
 
-    fs.readdirSync(eventsDirPath)
-        .filter(file => file.endsWith(fileExtension))
-        .forEach(async (file) => {
-            const eventFilePath = path.join(eventsDirPath, file)
-            const event = await importEvent(eventFilePath)
+    const eventFiles = fs.readdirSync(eventsDirPath).filter((file) => file.endsWith(fileExtension))
 
-            if (event.type === "on") {
-                loadOnEvent(event)
-    
-            } else {
-                throw new Error(`> [client-error] The value '${event.type}' that informed for the type of the event is invalid.`)
+    for (const file of eventFiles) {
+        const eventFilePath = path.join(eventsDirPath, file)
+        const event = await importEvent(eventFilePath)
+
+        switch (event.type) {
+            case "on":
+                client.on(event.name, (context) => event.run(context as Context))
+                break
+            case "once": {
+                let alreadyRan = false
+
+                client.on(event.name, async (context, next) => {
+                    if (alreadyRan) return next()
+
+                    alreadyRan = true
+                    await event.run(context as Context)
+                })
+                break
             }
+            default:
+                logger.error(`The value '${event.type}' that informed for the type of the event is invalid.`, {
+                    eventFilePath: eventFilePath
+                })
+                throw new Error(`The value '${event.type}' that informed for the type of the event is invalid.`)
+        }
 
-            function loadOnEvent(event: IEvent) {
-                client.on(event.name, (context) => event.run(context))
-
-                console.log(`> [client] The event '${event.name}' loaded.`)
-            }
-        })
+        logger.info(`The event '${event.name}' loaded.`, { eventFilePath: eventFilePath })
+    }
 
     async function importEvent(eventFilePath: string) {
-        const event: IEvent  = (await import(eventFilePath)).event
+        const event: Event = (await import(eventFilePath)).event
         return event
     }
 }

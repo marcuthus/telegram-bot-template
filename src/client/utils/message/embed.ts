@@ -1,45 +1,27 @@
-interface IField {
+interface Field {
     name: string
     value: string
 }
 
-interface IAuthor {
+interface Author {
     name: string
     emoji: string
 }
 
-interface IFooter {
+interface Footer {
     text: string
     emoji: string
 }
 
-type ITimestamp = Date | undefined
+export class Embed {
+    private author = ""
+    private title = ""
+    private description = ""
+    private fields = ""
+    private timestamp = ""
+    private footer = ""
 
-class Embed {
-    private author: string = ""
-    private title: string = ""
-    private description: string = ""
-    private fields: string = ""
-    private timestamp: string = ""
-    private footer: string = ""
-
-    public constructor(
-        author?: IAuthor,
-        title?: string,
-        fields?: IField[],
-        description?: string,
-        timestamp?: ITimestamp,
-        footer?: IFooter
-    ) {
-        if (author) this.setAuthor(author)
-        if (title) this.setTitle(title)
-        if (description) this.setDescription(description)
-        if (fields) this.setFields(fields)
-        if (timestamp) this.setTimestamp(timestamp)
-        if (footer) this.setFooter(footer)
-    }
-
-    public setAuthor(author: IAuthor) {
+    public setAuthor(author: Author) {
         this.author = `<b>${author.emoji} ${author.name}</b>`
         return this
     }
@@ -54,44 +36,24 @@ class Embed {
         return this
     }
 
-    public setFields(fields: IField[]) {
-        this.fields = fields.map(field => {
-            return `<b>${field.name}:</b>\n${field.value}\n`
-        }).join("")
+    public setFields(fields: Field[]) {
+        this.fields = fields.map((field) => `<b>${field.name}:</b>\n${field.value}\n`).join("")
         return this
     }
 
-    public setTimestamp(timestamp: ITimestamp) {
-        const date = timestamp?.toLocaleDateString("pt-br") ?? new Date().toLocaleDateString("pt-br")
-        const time = timestamp?.toLocaleTimeString("pt-br") ?? new Date().toLocaleTimeString("pt-br")
-        this.timestamp = `<i>${date}, ${time}</i>`
+    public setTimestamp(timestamp: Date = new Date()) {
+        this.timestamp = `<i>${timestamp.toLocaleDateString("pt-br")}, ${timestamp.toLocaleTimeString("pt-br")}</i>`
         return this
     }
 
-    public setFooter(footer: IFooter) {
+    public setFooter(footer: Footer) {
         this.footer = `<b><i>${footer.emoji} ${footer.text}</i></b>`
         return this
     }
 
-    public buildMessageText() {
-        let message = ""
+    public build() {
+        const bottom = [this.footer, this.timestamp].filter(Boolean).join(" | ")
 
-        if (this.author) message += `${this.author}\n\n`
-        if (this.title)  message += `${this.title}\n\n`
-        if (this.description) message += `${this.description}\n\n`
-        if (this.fields) message += `${this.fields}\n\n`
-        if (this.footer) {
-            if (this.timestamp) {
-                if (this.timestamp) message += `${this.footer} | ${this.timestamp}`
-            }
-
-            else message += this.footer
-        } else if (this.timestamp) message += this.timestamp
-
-        message = message.trim()
-        
-        return message
+        return [this.author, this.title, this.description, this.fields, bottom].filter(Boolean).join("\n\n").trim()
     }
 }
-
-export default Embed

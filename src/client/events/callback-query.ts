@@ -1,9 +1,12 @@
-import IEvent from "../interfaces/event"
+import { createScopedLogger } from "../../helpers/logger.helper"
+import { Event } from "../interfaces/event"
 
-export const event: IEvent = {
+const logger = createScopedLogger("client")
+
+export const event: Event = {
     name: "callback_query",
     type: "on",
     run: async (context) => {
-        console.log(context.callbackQuery)
+        logger.info("Callback query received.", { callbackQuery: context.callbackQuery })
     }
 }

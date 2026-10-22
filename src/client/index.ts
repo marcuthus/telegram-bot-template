@@ -1,48 +1,76 @@
 import * as telegraf from "telegraf"
 
+import { createScopedLogger } from "../helpers/logger.helper"
+import { configHelper } from "../helpers/config.helper"
+
+import { AnyCommand } from "./interfaces/command/index"
 import handleCommands from "./handlers/commands"
 import handleEvents from "./handlers/events"
-import { bot } from "./settings"
+
+const logger = createScopedLogger("client")
+
+export class Client extends telegraf.Telegraf {
+    public commands: Map<string, AnyCommand> = new Map()
+}
 
 function createClient() {
-    const client = new telegraf.Telegraf(bot.token)
+    const token = configHelper.token
 
-    client.use(async (context, next) => {
-        const start = new Date().getTime()
+    const client = new Client(token)
+
+    client.use(async (_context, next) => {
+        const start = Date.now()
         await next()
-        const responseInMilliseconds = new Date().getTime() - start
-        console.log(`> [client] Telegram response time: ${responseInMilliseconds} ms.`)
+        logger.debug(`Telegram response time: ${Date.now() - start} ms.`)
+    })
+
+    client.catch((error, context) => {
+        logger.error(`Error on update '${context.updateType}': ${error}`)
     })
 
     async function useEventsHandler() {
         await handleEvents(client)
     }
 
-    async function useCommandHandler() {
+    async function useCommandsHandler() {
         await handleCommands(client)
     }
 
     async function start() {
-        console.log("> [client] Starting...")
-        
+        logger.info("Starting...")
+
         await useEventsHandler()
-        await useCommandHandler()
-        
-        client.launch()
-            .then(_ => {
-                console.log(`> [client] Successfully started as '${client.botInfo?.username}'.`)
-            })
+        await useCommandsHandler()
+
+        await client.telegram.setMyCommands(
+            Array.from(client.commands.values()).map((command) => ({
+                command: command.name,
+                description: command.description
+            }))
+        )
+
+        logger.info("All commands synchronized with Telegram!")
+
+        // launch() only resolves when the bot stops, so the callback signals the startup.
+        await client.launch(() => {
+            logger.info(`Successfully started as '${client.botInfo?.username}'`)
+        })
     }
 
-    function stop() {
-        console.log("> [client] Stoping...")
+    function stop(reason?: string) {
+        logger.info("Stoping...")
 
-        client.stop()
+        client.stop(reason)
 
-        console.log("> [client] Stopped successfully!")
+        logger.info("Successfully stopped!")
     }
 
-    return { start, stop }
+    async function restart() {
+        stop("restart")
+        await start()
+    }
+
+    return { start, stop, restart }
 }
 
 export default createClient
