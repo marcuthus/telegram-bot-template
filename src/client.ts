@@ -1,9 +1,8 @@
 import * as telegraf from "telegraf"
 
-import { createScopedLogger } from "../helpers/logger.helper"
-import { configHelper } from "../helpers/config.helper"
-
+import { createScopedLogger } from "./helpers/logger.helper"
 import { AnyCommand } from "./interfaces/command/index"
+import { configHelper } from "./helpers/config.helper"
 import handleCommands from "./handlers/commands"
 import handleEvents from "./handlers/events"
 

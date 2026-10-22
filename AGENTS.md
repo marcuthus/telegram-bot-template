@@ -89,7 +89,7 @@ export interface Command<T extends z.ZodObject = z.ZodObject> {
 ### Naming Conventions
 
 - **Files**: kebab-case (e.g., `ping.ts`, `interaction-create.ts`, `command.interface.ts`)
-- **Directories**: kebab-case (e.g., `client/`, `commands/`, `events/`)
+- **Directories**: kebab-case (e.g., `commands/`, `events/`, `handlers/`)
 - **Interfaces**: PascalCase with descriptive names (e.g., `Command`, `Event`, `ExtendedContext`)
 - **Types**: PascalCase (e.g., `RunFunc`)
 - **Enums**: PascalCase with singular form (e.g., `EventType`)
@@ -119,7 +119,7 @@ try {
 
 **Commands Structure:**
 
-- Place commands in `src/client/commands/<category>/<command-name>.ts`
+- Place commands in `src/commands/<category>/<command-name>.ts`
 - Export a `command` object with `name`, `description`, optional `schema` and a `run` function
 - Arguments are positional (`/command arg1 arg2`) and validated with [`@marcuth/argus`](https://www.npmjs.com/package/@marcuth/argus) + `zod`: declare a `schema` (`z.object({...})`) whose keys map to the arguments in order, and type the command as `Command<typeof schema>` to get typed `options` in `run`. Argus/Zod errors are reported to the user automatically
 - Commands are synchronized with Telegram (`setMyCommands`) on startup
@@ -127,15 +127,15 @@ try {
 
 **Events Structure:**
 
-- Place events in `src/client/events/<event-name>.ts`
+- Place events in `src/events/<event-name>.ts`
 - Export an `event` object with `name` (a Telegram update type), `type` (`"on"`, `"once"`), and `run` function
 - Event types defined in `src/enums/event-type.enum.ts`
 
 **Client Pattern:**
 
 - Use factory function `createClient()` instead of direct instantiation
-- Client class extends `telegraf.Telegraf` with a custom `commands` property
-- Handlers in `src/client/handlers/` automatically load commands and events
+- Client class (`src/client.ts`) extends `telegraf.Telegraf` with a custom `commands` property
+- Handlers in `src/handlers/` automatically load commands and events
 
 ### Configuration
 

@@ -5,10 +5,10 @@ import { ArgusError } from "@marcuth/argus"
 import { z } from "zod"
 
 import { AnyCommand, ExtendedContext } from "../interfaces/command/index"
-import { createScopedLogger } from "../../helpers/logger.helper"
+import { createScopedLogger } from "../helpers/logger.helper"
 import { escapeHtml } from "../utils/message/escape-html"
-import { argus } from "../../helpers/argus.helper"
-import { Client } from "../index"
+import { argus } from "../helpers/argus.helper"
+import { Client } from "../client"
 
 const logger = createScopedLogger("client")
 

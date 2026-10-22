@@ -1,4 +1,4 @@
-import { createScopedLogger } from "../../helpers/logger.helper"
+import { createScopedLogger } from "../helpers/logger.helper"
 import { Event } from "../interfaces/event"
 
 const logger = createScopedLogger("client")

@@ -72,14 +72,14 @@ Um template robusto e moderno para criação de bots de Telegram utilizando **Ty
 
 ```text
 src/
-├── client/          # Lógica central do bot
-│   ├── commands/    # Comandos
-│   ├── events/      # Handlers de eventos do Telegram
-│   ├── handlers/    # Carregadores automáticos
-│   ├── interfaces/  # Definições de tipos e interfaces
-│   └── utils/       # Utilitários do cliente
+├── client.ts        # Criação e ciclo de vida do cliente
+├── commands/        # Comandos
 ├── enums/           # Enums globais
-└── helpers/         # Auxiliares (config, logger, argus)
+├── events/          # Handlers de eventos do Telegram
+├── handlers/        # Carregadores automáticos
+├── helpers/         # Auxiliares (config, logger, argus)
+├── interfaces/      # Definições de tipos e interfaces
+└── utils/           # Utilitários
 ```
 
 ## ⚖️ Licença

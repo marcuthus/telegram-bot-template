@@ -3,9 +3,9 @@ import fs from "node:fs"
 
 import { Context } from "telegraf"
 
-import { createScopedLogger } from "../../helpers/logger.helper"
+import { createScopedLogger } from "../helpers/logger.helper"
 import { Event } from "../interfaces/event"
-import { Client } from "../index"
+import { Client } from "../client"
 
 const logger = createScopedLogger("client")
 

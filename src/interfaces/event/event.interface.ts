@@ -1,6 +1,6 @@
 import * as telegraf from "telegraf"
 
-import { EventType } from "../../../enums"
+import { EventType } from "../../enums"
 
 type RunFunc = (context: telegraf.Context) => Promise<void>
 
