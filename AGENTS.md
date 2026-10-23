@@ -157,3 +157,12 @@ try {
 - `docker-compose.yml` loads `.env` through `env_file` and keeps `logs/` in named volumes.
 - `.dockerignore` keeps `.env`, `logs/`, `auth/`, `.git` and build output out of the image. Never copy secrets into the image.
 - Build and run: `docker compose up --build`.
+
+## Chat Management Commands
+
+- Telegram command names only allow `a-z`, `0-9` and `_` (use `ban_member`, not `ban-member`).
+- Group commands live in `src/commands/group/`; use `requireChatAdmin(context)` (`src/utils/command/require-chat-admin.ts`) to restrict them to chat admins or the bot owner.
+- `resolveTargetUser(context, idArgument)` resolves the target from a replied message, a text mention (users without `@username`) or a numeric ID.
+- Commands read the registry (`commands`, `commandCategories`) through `getClient(context)`; the client is injected in `context.state` by a middleware in `src/client.ts`.
+- Commands used as a photo caption (e.g. `/sticker`) are routed by the `photo` listener in `src/handlers/commands.ts`.
+- The Bot API cannot list all members, add users or create groups, so only `admins`, `ban_member`, `invite` and `leave` exist.

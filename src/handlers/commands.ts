@@ -51,11 +51,23 @@ export default async (client: Client) => {
             }
 
             client.commands.set(command.name, command)
+            client.commandCategories.set(command.name, dir)
             client.command(command.name, (context) => runCommand(command, context.message.text, context))
 
             logger.info(`The command '${command.name}' loaded.`)
         }
     }
+
+    client.on("photo", async (context) => {
+        const caption = context.message.caption
+
+        if (!caption?.startsWith("/")) return
+
+        const name = caption.slice(1).split(/\s/)[0].split("@")[0].toLowerCase()
+        const command = client.commands.get(name)
+
+        if (command) await runCommand(command, caption, context)
+    })
 
     async function runCommand(command: AnyCommand, messageContent: string, context: ExtendedContext) {
         let options: Record<string, unknown> = {}

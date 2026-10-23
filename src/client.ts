@@ -10,12 +10,18 @@ const logger = createScopedLogger("client")
 
 export class Client extends telegraf.Telegraf {
     public commands: Map<string, AnyCommand> = new Map()
+    public commandCategories: Map<string, string> = new Map()
 }
 
 function createClient() {
     const token = configHelper.token
 
     const client = new Client(token)
+
+    client.use(async (context, next) => {
+        context.state.client = client
+        await next()
+    })
 
     client.use(async (_context, next) => {
         const start = Date.now()
