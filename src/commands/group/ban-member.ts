@@ -2,6 +2,7 @@ import { z } from "zod"
 
 import { requireChatAdmin } from "../../utils/command/require-chat-admin"
 import { resolveTargetUser } from "../../utils/message/target-user"
+import { isBotOwnerId } from "../../utils/command/is-owner-id"
 import { escapeHtml } from "../../utils/message/escape-html"
 import { Command } from "../../interfaces/command"
 
@@ -26,6 +27,22 @@ export const command: Command<typeof schema> = {
 
         if (target.id === context.from?.id) {
             await context.reply("Você não pode banir a si mesmo.")
+            return
+        }
+
+        // O bot bane com as próprias permissões: sem checar o alvo, um administrador comum poderia
+        // remover outros administradores (ou o dono) que o bot tenha permissão de banir.
+        if (target.id === context.botInfo.id) {
+            await context.reply("Não posso banir a mim mesmo.")
+            return
+        }
+
+        const targetMember = await context.getChatMember(target.id).catch(() => null)
+        const author = await context.getChatMember(context.from!.id)
+        const targetIsStaff = targetMember?.status === "creator" || targetMember?.status === "administrator"
+
+        if (targetIsStaff && author.status !== "creator" && !isBotOwnerId(String(context.from!.id))) {
+            await context.reply("Apenas o criador do grupo pode banir outro administrador.")
             return
         }
 
